@@ -1,0 +1,25 @@
+# This comes from the environment variable Heroku provides for http and https requests
+:{$PORT}
+
+basicauth /* bcrypt {
+  # Ask users to generate their own by going to the website and clicking "cancel"
+  # when the basic auth form pops up.
+  #
+  # Format:
+  # username base64encrypted_bcrypted_password
+  {{ range (ds "data").users }}
+  {{ .name }} {{ .hash }}
+  {{ end }}
+}
+
+handle_errors {
+  @passgen {
+    expression {http.error.status_code} == 401
+  }
+	root @passgen /passgen
+  templates
+  file_server
+}
+
+root * /site
+file_server browse

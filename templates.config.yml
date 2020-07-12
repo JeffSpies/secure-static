@@ -1,0 +1,7 @@
+inputFiles:
+  - /templates/Caddyfile.tmpl
+outputFiles:
+  - /etc/caddy/Caddyfile
+datasources:
+  data:
+    url: file:///templates.data.yml

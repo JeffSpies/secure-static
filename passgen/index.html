@@ -1,0 +1,65 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Unauthorized</h1> 
+    <p>
+      To get access to this private site, you'll need a username and password. 
+    </p>
+    <p>
+      We're going to generate a secure string of characters called a hash. This hash cannot be reversed to discover your original password. You'll send this hash rather than your plain-text password to whomever runs this site such that the next time you log in, the server will run the same hashing algorithm on your password and compare the resulting hash to the hash generated here.
+    </p>
+    <p>
+      Even though no one will be able to see your password just by looking at the hash, we recommend that you use a strong password.
+    </p>
+    <p>
+      <form onsubmit="event.preventDefault();submitted(event);return false">
+        Password: <input id="password" required minlength=6 type="password" /><br />
+        Password (again): <input id="password2" required minlength=6 type="password" /><br />
+        <input type="submit" value="Generate hash">
+      </form>
+    </p>
+    <div id="resultSection" style="display: none;">
+      <p>Send this text to whomever runs the server:</p>
+      <input type="text" value="" id="output" /> <br />
+      <button onclick="copy()">Copy hash to clipboard</button>
+    </div>
+    <script type="text/javascript">
+      {{include "bcrypt.min.js"}}
+    </script>
+    <script type="text/javascript">
+      var bcrypt = dcodeIO.bcrypt;
+      function submitted(event) {
+        try {
+          var password = document.getElementById("password").value;
+          var salt = bcrypt.genSaltSync(10);
+          var hash = bcrypt.hashSync(password, salt);
+          var output = document.getElementById("output");
+          var base64encoded = window.btoa(hash);
+          output.value = base64encoded;
+          output.size = base64encoded.length + 15;
+          document.getElementById("resultSection").style.display = "block";
+        } catch (e) {
+          throw new Error(e.message);
+        }
+      }
+      function copy() {
+        var copyText = document.getElementById("output");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /*For mobile devices*/
+        document.execCommand("copy");
+      }
+      window.addEventListener('load', function() {
+        const password1 = document.getElementById("password");
+        const password2 = document.getElementById("password2");
+        password2.addEventListener("input", function (event) {
+          if (password1.value !== password2.value) {
+            password2.setCustomValidity("The passwords you entered do not match");
+          } else {
+            password2.setCustomValidity("");
+          }
+        });
+      }, false);
+    </script>
+  </body>
+</html>
